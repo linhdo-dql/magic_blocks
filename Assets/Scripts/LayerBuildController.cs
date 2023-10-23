@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,7 +16,9 @@ public class LayerBuildController : MonoBehaviour
         BuildLayerState state = BuildLayerState.Build;
         switch (nameState)
         {
-            case "Build": state = BuildLayerState.Build; ; break;
+            case "Build":
+                state = BuildLayerState.Build;
+                SetBuildState(); break;
             case "View":
                 state = BuildLayerState.View;
                 SetViewState(); break;
@@ -24,8 +27,16 @@ public class LayerBuildController : MonoBehaviour
         LayerBuildStateController.instance.SetBuildLayerState(state);
     }
 
+    private void SetBuildState()
+    {
+        LayoutBlocksController.instance.Reset();
+        LayoutResController.instance.lockScroll = false;
+    }
+
     private void SetViewState()
     {
         LayoutBlocksController.instance.GetComponent<Rotatable>().speed = 0.3f;
+        LayoutResController.instance.lockScroll = true;
     }
+
 }

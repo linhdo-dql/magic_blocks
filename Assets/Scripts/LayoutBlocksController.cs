@@ -62,7 +62,7 @@ public class LayoutBlocksController : MonoBehaviour
             else
             {
                 collider.enabled = value;
-                collider.size = new Vector3(1, 1, 4);
+                collider.size = new Vector3(1, 1, 5);
             }
         }
     }
@@ -78,5 +78,13 @@ public class LayoutBlocksController : MonoBehaviour
     void Update()
     {
 
+    }
+
+    internal void Reset()
+    {
+        transform.position = new Vector3(0, 0, 2);
+        transform.eulerAngles = new Vector3(10, 0, 0);
+        transform.localScale = Vector3.one;
+        GetComponent<Rotatable>().speed = 0;
     }
 }

@@ -207,3 +207,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: 
+  isOnTray: 0
+  isOnFrame: 0

@@ -23,14 +23,6 @@ public class BlockOnTrayController : MonoBehaviour
     void Update()
     {
         transform.position = new Vector3(transform.position.x, transform.position.y, 0.5f);
-        Vector3 viewportPosition = Camera.main.WorldToViewportPoint(transform.position);
-
-        // if (viewportPosition.x < 0 || viewportPosition.x > 1 || viewportPosition.y < 0 || viewportPosition.y > 1)
-        // {
-        //     // Cube has moved out of the screen
-        //     Debug.Log("Cube is outside the screen!");
-
-        // }
     }
 
     public void PopulateData(float oldScale, string color)

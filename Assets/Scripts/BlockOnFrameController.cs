@@ -23,7 +23,7 @@ public class BlockOnFrameController : MonoBehaviour
     private void OnTriggerStay(Collider collider)
     {
         var colliderController = collider.GetComponent<BlockOnTrayController>();
-        if (colliderController.isTriggered) return;
+        if (colliderController.isTriggered || isFilled) return;
         Vector3 direction;
         float distance;
         Physics.ComputePenetration(collider, collider.transform.position, collider.transform.rotation,

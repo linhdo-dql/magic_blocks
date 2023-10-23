@@ -16,7 +16,7 @@ public class LayoutResController : MonoBehaviour
     private Vector3 mousePosition;
     private float lastMousePoint;
     private Vector3 lastMousePosition;
-    private bool lockScroll;
+    public bool lockScroll;
 
     void Awake()
     {

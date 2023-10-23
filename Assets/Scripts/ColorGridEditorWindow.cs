@@ -1,7 +1,8 @@
 using UnityEditor;
 using UnityEngine;
 using System.IO;
-using System.Text;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 #if UNITY_EDITOR
 public class ColorGridEditorWindow : EditorWindow
 {
@@ -10,9 +11,7 @@ public class ColorGridEditorWindow : EditorWindow
     private int columnCount = 10;
     private string arrayName = "ColorGrid";
     private DefaultAsset folder;
-    private int selectedLayer = 0;
-    private bool createNewFolder = false;
-    private string newFolderName = "";
+    private string fileName = "";
     private Vector2 scrollPosition;
 
     [MenuItem("Window/Color Grid Editor")]
@@ -24,7 +23,7 @@ public class ColorGridEditorWindow : EditorWindow
     private void OnEnable()
     {
         // Khởi tạo mảng 2 chiều với kích thước mặc định là 10x10
-        colorGrid = new Color[columnCount, rowCount];
+        colorGrid = new Color[rowCount, columnCount];
     }
 
     private void OnGUI()
@@ -40,7 +39,7 @@ public class ColorGridEditorWindow : EditorWindow
             EditorGUILayout.BeginHorizontal();
             for (int x = 0; x < colorGrid.GetLength(0); x++)
             {
-                colorGrid[x, y] = EditorGUILayout.ColorField(colorGrid[x, y], GUILayout.Width(40), GUILayout.Height(40));
+                colorGrid[x, y] = EditorGUILayout.ColorField(colorGrid[x, y], GUILayout.Width(50), GUILayout.Height(50));
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -54,7 +53,7 @@ public class ColorGridEditorWindow : EditorWindow
         columnCount = EditorGUILayout.IntField("Số cột:", columnCount);
 
         // Kiểm tra nếu số hàng hoặc số cột thay đổi, tạo lại mảng 2 chiều với kích thước mới
-        if (rowCount != colorGrid.GetLength(1) || columnCount != colorGrid.GetLength(0))
+        if (rowCount != colorGrid.GetLength(0) || columnCount != colorGrid.GetLength(1))
         {
             CreateColorGrid();
         }
@@ -66,21 +65,8 @@ public class ColorGridEditorWindow : EditorWindow
 
         GUILayout.Space(20);
 
-        // Checkbox cho phép tạo thư mục mới
-        EditorGUI.BeginDisabledGroup(folder != null);
-        createNewFolder = EditorGUILayout.Toggle("Tạo thư mục mới", createNewFolder);
-        EditorGUI.EndDisabledGroup();
-
-        // Nếu checkbox được chọn, hiển thị ô nhập dữ liệu để nhập tên thư mục mới
-        if (createNewFolder)
-        {
-            newFolderName = EditorGUILayout.TextField("Tên thư mục mới:", newFolderName);
-        }
-
-        GUILayout.Space(20);
-
-        // Nhập tên layer
-        selectedLayer = EditorGUILayout.IntField("Layer:", selectedLayer);
+        // Nhập tên file
+        fileName = EditorGUILayout.TextField("Layer Index:", fileName);
 
         GUILayout.Space(20);
 
@@ -98,29 +84,17 @@ public class ColorGridEditorWindow : EditorWindow
             ReadColorGridFromFile();
         }
 
-        // Nếu nhấn nút "Xuất File", ghi mảng 2 chiều các mã màu ra file CSV
+        // Nếu nhấn nút "Xuất File", ghi mảng 2 chiều các mã màu ra file JSON
         if (GUILayout.Button("Xuất File"))
         {
-            ExportColorGridToCSV();
+            ExportColorGridToJSON();
         }
     }
 
     private void CreateColorGrid()
     {
-        colorGrid = new Color[columnCount, rowCount];
-        ResetColorGrid();
-        Debug.Log("Đã tạo mảng 2 chiều với kích thước " + columnCount + " cột và " + rowCount + " hàng!");
-    }
-
-    private void ResetColorGrid()
-    {
-        for (int y = 0; y < colorGrid.GetLength(1); y++)
-        {
-            for (int x = 0; x < colorGrid.GetLength(0); x++)
-            {
-                colorGrid[x, y] = Color.clear;
-            }
-        }
+        colorGrid = new Color[rowCount, columnCount];
+        Debug.Log("Đã tạo mảng 2 chiều với kích thước " + rowCount + " hàng và " + columnCount + " cột!");
     }
 
     private void ResetValues()
@@ -128,56 +102,40 @@ public class ColorGridEditorWindow : EditorWindow
         rowCount = 0;
         columnCount = 0;
         folder = null;
-        selectedLayer = 0;
-        createNewFolder = false;
-        newFolderName = "";
+        fileName = "";
     }
 
-    private void ExportColorGridToCSV()
+    private void ExportColorGridToJSON()
     {
-        string folderPath = "";
         if (folder != null)
         {
-            folderPath = AssetDatabase.GetAssetPath(folder);
-        }
-        else if (createNewFolder && !string.IsNullOrEmpty(newFolderName))
-        {
-            folderPath = Path.Combine(Application.dataPath, "StreamingAssets/Datas", newFolderName);
+            string folderPath = AssetDatabase.GetAssetPath(folder);
+            string filePath = Path.Combine(folderPath, "layer_" + fileName + ".json");
+
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath);
             }
-        }
 
-        if (!string.IsNullOrEmpty(folderPath))
-        {
-            string fileName = "colors_" + selectedLayer.ToString() + ".csv";
-            string filePath = Path.Combine(folderPath, fileName);
-
-            StringBuilder csv = new StringBuilder();
+            ColorData colorData = new ColorData();
+            colorData.colors = new List<SerializableColor>();
 
             for (int y = 0; y < colorGrid.GetLength(1); y++)
             {
                 for (int x = 0; x < colorGrid.GetLength(0); x++)
                 {
-                    Color color = colorGrid[x, y];
-                    string colorCode = ColorUtility.ToHtmlStringRGB(color);
-                    csv.Append(colorCode);
-                    if (x < colorGrid.GetLength(0) - 1)
-                    {
-                        csv.Append(",");
-                    }
+                    colorData.colors.Add(new SerializableColor(colorGrid[x, y], x, y));
                 }
-                csv.AppendLine();
             }
 
-            File.WriteAllText(filePath, csv.ToString(), Encoding.UTF8);
+            string jsonData = JsonConvert.SerializeObject(colorData, Formatting.Indented);
+            File.WriteAllText(filePath, jsonData);
 
             Debug.Log("Xuất File thành công!");
         }
         else
         {
-            Debug.LogError("Vui lòng chọn thư mục lưu trữ hoặc tạo thư mục mới!");
+            Debug.LogError("Vui lòng chọn thư mục lưu trữ!");
         }
     }
 
@@ -186,32 +144,38 @@ public class ColorGridEditorWindow : EditorWindow
         if (folder != null)
         {
             string folderPath = AssetDatabase.GetAssetPath(folder);
-            string fileName = "colors_" + selectedLayer.ToString() + ".csv";
-            string filePath = Path.Combine(folderPath, fileName);
-
+            string filePath = Path.Combine(folderPath, "layer_" + fileName + ".json");
             if (File.Exists(filePath))
             {
-
-                string[] lines = System.IO.File.ReadAllLines(filePath);
-                rowCount = lines.Length;
-                columnCount = lines[0].Split(',').Length;
-                colorGrid = new Color[rowCount, columnCount];
-
-                for (int y = 0; y < rowCount; y++)
+                string jsonData = File.ReadAllText(filePath);
+                ColorData colorData = JsonConvert.DeserializeObject<ColorData>(jsonData);
+                if (colorData != null && colorData.colors != null)
                 {
-                    string[] values = lines[y].Split(',');
-
-                    for (int x = 0; x < columnCount; x++)
+                    int maxRowCount = 0;
+                    int maxColumnCount = 0;
+                    foreach (SerializableColor serializableColor in colorData.colors)
                     {
-                        Color color;
-                        if (ColorUtility.TryParseHtmlString("#" + values[x], out color))
+                        maxRowCount = Mathf.Max(maxRowCount, serializableColor.x);
+                        maxColumnCount = Mathf.Max(maxColumnCount, serializableColor.y);
+                    }
+                    rowCount = maxRowCount + 1;
+                    columnCount = maxColumnCount + 1;
+                    colorGrid = new Color[rowCount, columnCount];
+                    foreach (SerializableColor serializableColor in colorData.colors)
+                    {
+                        int x = serializableColor.x;
+                        int y = serializableColor.y;
+                        if (x < rowCount && y < columnCount)
                         {
-                            colorGrid[x, y] = color;
+                            colorGrid[x, y] = serializableColor.ToColor();
                         }
                     }
+                    Debug.Log("Đọc File thành công!");
                 }
-
-                Debug.Log("Đọc File thành công!");
+                else
+                {
+                    Debug.LogError("Dữ liệu không hợp lệ!");
+                }
             }
             else
             {
@@ -224,4 +188,36 @@ public class ColorGridEditorWindow : EditorWindow
         }
     }
 }
+
 #endif
+[System.Serializable]
+public class ColorData
+{
+    public List<SerializableColor> colors;
+}
+
+[System.Serializable]
+public class SerializableColor
+{
+    public float r;
+    public float g;
+    public float b;
+    public float a;
+    public int x;
+    public int y;
+
+    public SerializableColor(Color color, int xPos, int yPos)
+    {
+        r = color.r;
+        g = color.g;
+        b = color.b;
+        a = color.a;
+        x = xPos;
+        y = yPos;
+    }
+
+    public Color ToColor()
+    {
+        return new Color(r, g, b, 1);
+    }
+}

@@ -1,7 +1,7 @@
 using System;
+using System.Collections;
 using System.IO;
-using System.Linq;
-using Flexalon;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -19,21 +19,30 @@ public class LayerDataController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GetDataOfLayer("ken", 0);
+        GetDataOfLayer("1", 3);
     }
 
     public void GetDataOfLayer(string modelName, int layerId)
     {
         folderName = modelName;
-        fileName = "colors_" + layerId + ".csv";
+        fileName = "layer_" + layerId + ".json";
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_LINUX || UNITY_IOS
         GetColorArrayFromFile();
-        string[,] layerColors = new string[,]
-        {
-            {"2708B2", "00D9FF", "FFFBFB", "E2FF53"},
-            {"none", "FD2020", "none", "none"},
-            {"none", "24FF00", "C000D4", "none"},
-            {"none", "none", "FFA0F9", "none"}
-        };
+#else  
+        StartCoroutine(GetDataFromFileAndroidWebGL());
+#endif
+
+        // string[,] layerColors = new string[,]
+        // {
+        //     {"2708B2", "00D9FF", "FFFBFB", "E2FF53"},
+        //     {"none", "FD2020", "none", "none"},
+        //     {"none", "24FF00", "C000D4", "none"},
+        //     {"none", "none", "FFA0F9", "none"}
+        // };
+
+    }
+    private void SetupLayout()
+    {
         LayoutBlocksController.instance.GenerateBlock(layerColors);
         Camera.main.orthographicSize = MathF.Max(layerColors.GetLength(0), layerColors.GetLength(1)) + 2;
         LayoutResController.instance.InitResources(layerColors);
@@ -41,8 +50,6 @@ public class LayerDataController : MonoBehaviour
         var trayScaleFactor = Camera.main.orthographicSize / 17;
         TrayController.instance.GetComponent<Transform>().localPosition = new Vector3(0, -Camera.main.orthographicSize + 1 + LayoutResController.instance.scaleRefactor / 2, 3);
         TrayController.instance.GetComponent<Transform>().localScale = new Vector3(25, trayScaleFactor + 0.05f, 1);
-
-        print(LayoutResController.instance.range);
     }
     // Update is called once per frame
     void Update()
@@ -52,55 +59,102 @@ public class LayerDataController : MonoBehaviour
 
     private void GetColorArrayFromFile()
     {
-        string filePath = Path.Combine(Application.streamingAssetsPath, "Datas", folderName, fileName);
+        string streamingAssetsPath = "";
+        var rowCount = 0;
+        var columnCount = 0;
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_LINUX
+        streamingAssetsPath = Path.Combine(Application.dataPath, "StreamingAssets");
+#elif UNITY_IOS
+        streamingAssetsPath = Path.Combine(Application.dataPath, "Raw"); 
+#endif
+        string filePath = Path.Combine(streamingAssetsPath, "Datas", folderName, fileName);
         if (File.Exists(filePath))
         {
-            string[] lines = File.ReadAllLines(filePath);
-            int rowCount = lines.Length;
-            int columnCount = lines[0].Split(',').Length;
-            layerColors = new string[columnCount, rowCount];
-            for (int y = 0; y < rowCount; y++)
+            string jsonData = File.ReadAllText(filePath);
+            ColorData colorData = JsonConvert.DeserializeObject<ColorData>(jsonData);
+            if (colorData != null && colorData.colors != null)
             {
-                string[] values = lines[y].Split(',');
-                for (int x = 0; x < columnCount; x++)
+                int maxRowCount = 0;
+                int maxColumnCount = 0;
+                foreach (SerializableColor serializableColor in colorData.colors)
                 {
-                    layerColors[x, y] = values[x];
+                    maxRowCount = Mathf.Max(maxRowCount, serializableColor.x);
+                    maxColumnCount = Mathf.Max(maxColumnCount, serializableColor.y);
                 }
+                rowCount = maxRowCount + 1;
+                columnCount = maxColumnCount + 1;
+                layerColors = new string[rowCount, columnCount];
+                foreach (SerializableColor serializableColor in colorData.colors)
+                {
+                    int x = serializableColor.x;
+                    int y = serializableColor.y;
+                    if (x < rowCount && y < columnCount)
+                    {
+                        layerColors[x, y] = ColorUtility.ToHtmlStringRGBA(serializableColor.ToColor());
+                    }
+                }
+                Debug.Log("Đọc File thành công!");
             }
-            Debug.Log("Đọc File thành công!");
+            else
+            {
+                Debug.LogError("Dữ liệu không hợp lệ!");
+            }
+            SetupLayout();
         }
         else
         {
-            Debug.LogError("File không tồn tại!");
+            Debug.Log("File không tồn tại");
         }
-        // if (File.Exists(filePath))
-        // {   
 
-        //     StreamReader reader = new StreamReader(filePath);
+    }
 
-        //     // Đọc số hàng và số cột từ file
-        //     int columnCount = int.Parse(reader.ReadLine().Trim());
-        //     int rowCount = int.Parse(reader.ReadLine().Trim());
+    private IEnumerator GetDataFromFileAndroidWebGL()
+    {
+        var rowCount = 0;
+        var columnCount = 0;
+        var streamingAssetsPath = Application.streamingAssetsPath;
+        string filePath = Path.Combine(streamingAssetsPath, "Datas", folderName, fileName);
+        using (UnityWebRequest www = UnityWebRequest.Get(filePath))
+        {
+            yield return www.SendWebRequest();
 
-        //     // Khởi tạo mảng 2 chiều chuỗi với kích thước từ file
-        //     layerColors = new string[columnCount, rowCount];
-
-        //     // Đọc mảng 2 chiều mã màu từ file
-        //     for (int y = 0; y < rowCount; y++)
-        //     {
-        //         string[] colorCodes = reader.ReadLine().Trim().Split(' ');
-
-        //         for (int x = 0; x < columnCount; x++)
-        //         {
-        //             layerColors[x, y] = colorCodes[x];
-        //         }
-        //     }
-
-        //     reader.Close();
-        // }
-        // else
-        // {
-        //     Debug.LogError("File không tồn tại: " + filePath);
-        // }
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                string jsonData = www.downloadHandler.text;
+                ColorData colorData = JsonConvert.DeserializeObject<ColorData>(jsonData);
+                if (colorData != null && colorData.colors != null)
+                {
+                    int maxRowCount = 0;
+                    int maxColumnCount = 0;
+                    foreach (SerializableColor serializableColor in colorData.colors)
+                    {
+                        maxRowCount = Mathf.Max(maxRowCount, serializableColor.x);
+                        maxColumnCount = Mathf.Max(maxColumnCount, serializableColor.y);
+                    }
+                    rowCount = maxRowCount + 1;
+                    columnCount = maxColumnCount + 1;
+                    layerColors = new string[rowCount, columnCount];
+                    foreach (SerializableColor serializableColor in colorData.colors)
+                    {
+                        int x = serializableColor.x;
+                        int y = serializableColor.y;
+                        if (x < rowCount && y < columnCount)
+                        {
+                            layerColors[x, y] = ColorUtility.ToHtmlStringRGBA(serializableColor.ToColor());
+                        }
+                    }
+                    Debug.Log("Đọc File thành công!");
+                }
+                else
+                {
+                    Debug.LogError("Dữ liệu không hợp lệ!");
+                }
+                SetupLayout();
+            }
+            else
+            {
+                Debug.Log("Error: " + www.error);
+            }
+        }
     }
 }
