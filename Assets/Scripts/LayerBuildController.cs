@@ -7,6 +7,7 @@ using static LayerBuildStateController;
 public class LayerBuildController : MonoBehaviour
 {
     public static LayerBuildController instance;
+    public GameObject closeButton;
     public List<GameObject> hideOnViewMode;
     void Awake()
     {
@@ -45,6 +46,7 @@ public class LayerBuildController : MonoBehaviour
     {
         LayoutBlocksController.instance.Reset();
         LayoutResController.instance.lockScroll = false;
+        closeButton.SetActive(false);
         foreach (var go in hideOnViewMode)
         {
             go.SetActive(true);
