@@ -34,7 +34,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1485057324659355726
 MonoBehaviour:
@@ -167,6 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   layoutBlock: {fileID: 1485057324659355726}
+  trayBorder: {fileID: 0}
   blockPrefab: {fileID: 6994045059600001670, guid: dc568b1d33e58450998954d603625995, type: 3}
   scaleRefactor: 0
   range: 0

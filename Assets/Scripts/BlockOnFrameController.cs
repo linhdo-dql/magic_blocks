@@ -13,6 +13,8 @@ public class BlockOnFrameController : MonoBehaviour
     private MeshRenderer _meshRenderer;
     private BoxCollider _collider;
     internal bool isTemp;
+    public int x;
+    public int y;
 
     // Start is called before the first frame update
     void Start()
@@ -30,7 +32,7 @@ public class BlockOnFrameController : MonoBehaviour
                                                         _collider, _collider.transform.position, _collider.transform.rotation,
                                                         out direction, out distance);
         float overlapPercentage = (distance / (_collider.bounds.size.magnitude + _collider.bounds.size.magnitude)) * 100f;
-        if (collider.CompareTag("CubeResource") && overlapPercentage > 5)
+        if (collider.CompareTag("CubeResource") && overlapPercentage > 3)
         {
             colliderController.isTriggered = true;
             ChangeColor(colliderController);
@@ -42,13 +44,21 @@ public class BlockOnFrameController : MonoBehaviour
 
     public void Clicked()
     {
-        if (!isFilled) return;
-        //SetTransparentMaterial
-        _meshRenderer.material = blockMaterial;
-        //Init a cube in Tray
-        LayoutResController.instance.ReturnCube(saveColor);
-        //Reset isFilled
-        isFilled = false;
+        if (!isFilled)
+        {
+            LayoutResController.instance.ChangedBlockRes(gameObject);
+        }
+        else
+        {
+            if (LayerBuildStateController.instance.crBuildLayerState != LayerBuildStateController.BuildLayerState.Break) return;
+            //SetTransparentMaterial
+            _meshRenderer.material = blockMaterial;
+            //Init a cube in Tray
+            LayoutResController.instance.ReturnCube(saveColor, x, y);
+            //Reset isFilled
+            isFilled = false;
+        }
+
     }
 
     private void ChangeColor(BlockOnTrayController colliderController)
@@ -57,5 +67,11 @@ public class BlockOnFrameController : MonoBehaviour
         UnityEngine.ColorUtility.TryParseHtmlString("#" + colliderController.color, out color_new);
         _meshRenderer.material.color = color_new;
         saveColor = color_new;
+    }
+
+    internal void SavePos(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
     }
 }

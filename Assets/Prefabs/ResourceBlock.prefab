@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 145466483994502224}
   - component: {fileID: 1192461526730262567}
   - component: {fileID: 6732850646410677746}
+  - component: {fileID: -6215357643320761490}
   m_Layer: 0
   m_Name: ResourceBlock
   m_TagString: CubeResource
@@ -209,3 +210,26 @@ MonoBehaviour:
   color: 
   isOnTray: 0
   isOnFrame: 0
+--- !u!114 &-6215357643320761490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6994045059600001670}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eda371e5375f454490a86f21559ee38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Use:
+    Filter: 0
+    IgnoreStartedOverGui: 1
+    RequiredFingerCount: 0
+    RequiredMouseButtons: 0
+    RequiredSelectable: {fileID: 0}
+  _camera: {fileID: 0}
+  sensitivity: 1
+  damping: -1
+  inertia: 0
+  remainingTranslation: {x: 0, y: 0, z: 0}

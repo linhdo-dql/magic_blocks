@@ -17,24 +17,29 @@ public class LayoutBlocksController : MonoBehaviour
     {
         instance = this;
     }
-    public void GenerateBlock(string[,] layerColors)
+    public void GenerateBlock(string[,] layerColors, List<SerializableColor> serializableColors)
     {
-        layoutBlock.Rows = (uint)layerColors.GetLength(1);
-        layoutBlock.Columns = (uint)layerColors.GetLength(0);
+        layoutBlock.Rows = layoutBlockDemo.Rows = (uint)layerColors.GetLength(1);
+        layoutBlock.Columns = layoutBlockDemo.Columns = (uint)layerColors.GetLength(0);
+        int count = 0;
         for (int i = 0; i < layoutBlock.Columns; i++)
         {
             for (int j = 0; j < layoutBlock.Rows; j++)
             {
                 var block = Instantiate(blockPrefab, layoutBlock.transform);
+                //Lưu tọa độ block
+                block.GetComponent<BlockOnFrameController>().SavePos(serializableColors[count].x, serializableColors[count].y);
+                count++;
+                var blockDemo = Instantiate(blockPrefab, layoutBlockDemo.transform);
                 var blockTransform = block.GetComponent<Transform>();
+                var blockDemoTransform = blockDemo.GetComponent<Transform>();
                 //                print(layerColors[i, j]);
                 // Mã màu hợp lệ, bạn có thể sử dụng đối tượng màu
                 Color color;
                 if (ColorUtility.TryParseHtmlString("#" + layerColors[i, j], out color))
                 {
-
                     block.GetComponent<MeshRenderer>().material = blockMaterial;
-                    block.GetComponent<MeshRenderer>().material.color = new Color(color.r, color.g, color.b, 0.25f);
+                    blockDemo.GetComponent<MeshRenderer>().material.color = color;
                 }
                 else
                 {
@@ -43,6 +48,9 @@ public class LayoutBlocksController : MonoBehaviour
                 }
                 var blockPos = blockTransform.localPosition;
                 block.GetComponent<Transform>().position = new Vector3(blockPos.x, blockPos.y, 0.5f);
+
+                var blockDemoPos = blockDemoTransform.localPosition;
+                blockDemo.GetComponent<Transform>().position = new Vector3(blockDemoPos.x, blockDemoPos.y, 0.5f);
             }
         }
     }
@@ -79,9 +87,41 @@ public class LayoutBlocksController : MonoBehaviour
     public float rotateSpeed = 5f;
     private Vector2 touchStart;
     public float rotationSpeed = 2f;
+    public GameObject blockResPrefab;
+    public FlexalonGridLayout layoutBlockDemo;
+    private float _initialFingersDistance;
+    private Vector3 _initialScale;
+    private float _minScaleFactor = 0.5f;
+    private float _maxScaleFactor = 2.0f;
+
     void Update()
     {
+        if (LayerBuildStateController.instance.crBuildLayerState == LayerBuildStateController.BuildLayerState.View)
+        {
+            if (Input.touches.Length == 2)
+            {
+                GetComponent<Rotatable>().speed = 0;
+                Touch t1 = Input.touches[0];
+                Touch t2 = Input.touches[1];
 
+                if (t1.phase == TouchPhase.Began || t2.phase == TouchPhase.Began)
+                {
+                    _initialFingersDistance = Vector2.Distance(t1.position, t2.position);
+                    _initialScale = transform.localScale;
+                }
+                else if (t1.phase == TouchPhase.Moved || t2.phase == TouchPhase.Moved)
+                {
+                    float currentFingersDistance = Vector2.Distance(t1.position, t2.position);
+                    float scaleFactor = currentFingersDistance / _initialFingersDistance;
+                    if (_minScaleFactor < (_initialScale * scaleFactor).x && (_initialScale * scaleFactor).x < _maxScaleFactor)
+                        transform.localScale = _initialScale * scaleFactor;
+                }
+            }
+            if (Input.touches.Length == 1)
+            {
+                GetComponent<Rotatable>().speed = 0.3f;
+            }
+        }
     }
 
     internal void Reset()

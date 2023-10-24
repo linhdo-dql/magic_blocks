@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -8,6 +9,7 @@ using UnityEngine.Networking;
 public class LayerDataController : MonoBehaviour
 {
     public string[,] layerColors;
+    public List<SerializableColor> serializableColors;
     private string folderName; // Tên thư mục chứa tệp tin
     private string fileName; // Tên tệp tin
     public static LayerDataController instance;
@@ -15,11 +17,12 @@ public class LayerDataController : MonoBehaviour
     void Awake()
     {
         instance = this;
+        serializableColors = new List<SerializableColor>();
     }
     // Start is called before the first frame update
     void Start()
     {
-        GetDataOfLayer("1", 3);
+        GetDataOfLayer("1", 2);
     }
 
     public void GetDataOfLayer(string modelName, int layerId)
@@ -43,13 +46,13 @@ public class LayerDataController : MonoBehaviour
     }
     private void SetupLayout()
     {
-        LayoutBlocksController.instance.GenerateBlock(layerColors);
-        Camera.main.orthographicSize = MathF.Max(layerColors.GetLength(0), layerColors.GetLength(1)) + 2;
-        LayoutResController.instance.InitResources(layerColors);
-        LayoutResController.instance.GetComponent<Transform>().localPosition = new Vector3((float)LayoutResController.instance.range + 0.5f, -Camera.main.orthographicSize + 1 + LayoutResController.instance.scaleRefactor / 2, 0);
-        var trayScaleFactor = Camera.main.orthographicSize / 17;
-        TrayController.instance.GetComponent<Transform>().localPosition = new Vector3(0, -Camera.main.orthographicSize + 1 + LayoutResController.instance.scaleRefactor / 2, 3);
-        TrayController.instance.GetComponent<Transform>().localScale = new Vector3(25, trayScaleFactor + 0.05f, 1);
+        LayoutBlocksController.instance.GenerateBlock(layerColors, serializableColors);
+        Camera.main.orthographicSize = MathF.Max(layerColors.GetLength(0), layerColors.GetLength(1)) + 4;
+        LayoutResController.instance.InitResources(layerColors, serializableColors);
+        LayoutResController.instance.GetComponent<Transform>().localPosition = new Vector3((float)LayoutResController.instance.range + 1f, -Camera.main.orthographicSize + 1 + LayoutResController.instance.scaleRefactor / 2, 0);
+
+        print("zo");
+        LayoutFrameDemoController.instance.SetLayoutDemo();
     }
     // Update is called once per frame
     void Update()
@@ -78,6 +81,7 @@ public class LayerDataController : MonoBehaviour
                 int maxColumnCount = 0;
                 foreach (SerializableColor serializableColor in colorData.colors)
                 {
+                    serializableColors.Add(serializableColor);
                     maxRowCount = Mathf.Max(maxRowCount, serializableColor.x);
                     maxColumnCount = Mathf.Max(maxColumnCount, serializableColor.y);
                 }

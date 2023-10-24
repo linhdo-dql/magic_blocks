@@ -21,6 +21,7 @@ public class TestScript : MonoBehaviour
     public void ChangeSize(int size)
     {
         ClearAllComponent();
+        LayerBuildController.instance.ChangeBuildState("Build");
         int fileName = 2;
         switch (size)
         {

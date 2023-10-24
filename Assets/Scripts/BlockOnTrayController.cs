@@ -12,6 +12,8 @@ public class BlockOnTrayController : MonoBehaviour
     public string color;
     public bool isOnTray;
     public bool isOnFrame;
+    public int x;
+    public int y;
 
     // Start is called before the first frame update
     void Start()
@@ -25,12 +27,14 @@ public class BlockOnTrayController : MonoBehaviour
         transform.position = new Vector3(transform.position.x, transform.position.y, 0.5f);
     }
 
-    public void PopulateData(float oldScale, string color)
+    public void PopulateData(float oldScale, string color, int x, int y)
     {
         isOnTray = false;
         isOnFrame = false;
         _oldScale = oldScale;
         this.color = color;
+        this.x = x;
+        this.y = y;
 
     }
 
@@ -42,6 +46,14 @@ public class BlockOnTrayController : MonoBehaviour
             {
                 transform.localScale = Vector3.one;
             });
+        }
+    }
+    void OnTriggerEnter(Collider collider)
+    {
+        if (collider.CompareTag("Tray"))
+        {
+            transform.SetParent(LayoutResController.instance.gameObject.transform);
+            LayoutResController.instance.GetComponent<FlexalonFlexibleLayout>().ForceUpdate();
         }
     }
 
@@ -59,6 +71,12 @@ public class BlockOnTrayController : MonoBehaviour
         {
             LayoutResController.instance.SubtractPos();
         }
+    }
+
+    public void SavePos(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
     }
 
 }

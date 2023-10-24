@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6275553347635849640
+--- !u!1 &5736719747568054765
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,42 +8,41 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6275553347635849637}
-  - component: {fileID: 6275553347635849636}
-  - component: {fileID: 6275553347635849639}
-  - component: {fileID: 6275553347635849638}
-  - component: {fileID: 6275553347635849641}
-  - component: {fileID: 6275553347635849634}
-  - component: {fileID: 6275553347635849635}
+  - component: {fileID: 5736719747568054752}
+  - component: {fileID: 5736719747568054753}
+  - component: {fileID: 5736719747568054754}
+  - component: {fileID: 5736719747568054755}
+  - component: {fileID: 5736719747568054759}
+  - component: {fileID: 558192860672937143}
   m_Layer: 0
-  m_Name: Frame
+  m_Name: FrameDemo
   m_TagString: Frame
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6275553347635849637
+--- !u!4 &5736719747568054752
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6275553347635849640}
+  m_GameObject: {fileID: 5736719747568054765}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6275553347635849636
+--- !u!114 &5736719747568054753
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6275553347635849640}
+  m_GameObject: {fileID: 5736719747568054765}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eded17fd0745dfb4f80ee23e2a11266a, type: 3}
@@ -80,13 +79,13 @@ MonoBehaviour:
     - {fileID: 0}
     _values:
     - {x: 0, y: 0, z: 0}
---- !u!114 &6275553347635849639
+--- !u!114 &5736719747568054754
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6275553347635849640}
+  m_GameObject: {fileID: 5736719747568054765}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 994c66b6148109b489689ed705d244cd, type: 3}
@@ -116,13 +115,13 @@ MonoBehaviour:
   TransformRotation: {x: 0, y: 0, z: 0, w: 1}
   TransformScale: {x: 1, y: 1, z: 1}
   TransformRectSize: {x: 0, y: 0}
---- !u!114 &6275553347635849638
+--- !u!114 &5736719747568054755
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6275553347635849640}
+  m_GameObject: {fileID: 5736719747568054765}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 00b0da67f6b3c9a4e84ed47af9da4884, type: 3}
@@ -172,34 +171,13 @@ MonoBehaviour:
   _paddingFront: 0
   _paddingBack: 0
   _skipLayout: 0
---- !u!114 &6275553347635849641
+--- !u!114 &5736719747568054759
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6275553347635849640}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ce4f2934b3d6490baa107281024c581, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  layoutBlock: {fileID: 6275553347635849636}
-  blockPrefab: {fileID: 6994045059600001670, guid: 5f3496bac81aa4d13b49fb8fd83aa077, type: 3}
-  transparentMaterial: {fileID: 2100000, guid: cc6b0e6e56253473a93916fb055b49e5, type: 2}
-  blockMaterial: {fileID: 2100000, guid: b4f38024b39f14159bc7bbc0bdf54f64, type: 2}
-  rotationCenter: {fileID: 6275553347635849637}
-  rotateSpeed: 10
-  rotationSpeed: 2
-  blockResPrefab: {fileID: 0}
-  layoutBlockDemo: {fileID: 0}
---- !u!114 &6275553347635849634
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6275553347635849640}
+  m_GameObject: {fileID: 5736719747568054765}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 928ebc24371a97e46b836c8774e2556c, type: 3}
@@ -210,67 +188,16 @@ MonoBehaviour:
   _minObjects: 0
   _maxObjects: 0
   _margin: {x: 0, y: 0, z: 0}
---- !u!114 &6275553347635849635
+--- !u!114 &558192860672937143
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6275553347635849640}
+  m_GameObject: {fileID: 5736719747568054765}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7dc3aa1f94d674d1f83da9f1f1be4f96, type: 3}
+  m_Script: {fileID: 11500000, guid: 98c61f952279f4a0d9f325213ccedddd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pressed:
-    m_Name: Pressed
-    m_Type: 1
-    m_ExpectedControlType: Button
-    m_Id: 319eb226-7d3c-46e4-85e3-df02b7b7fc13
-    m_Processors: 
-    m_Interactions: Press
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: 5c895b7c-1fb8-4604-a68c-47a986ff2385
-      m_Path: <Mouse>/leftButton
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Pressed
-      m_Flags: 0
-    - m_Name: 
-      m_Id: 6d7f1d36-b025-4bd0-a079-5bc6a45d9847
-      m_Path: <Touchscreen>/Press
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Pressed
-      m_Flags: 0
-    m_Flags: 0
-  axis:
-    m_Name: Axis
-    m_Type: 0
-    m_ExpectedControlType: Vector2
-    m_Id: 4c2542d4-7741-4beb-ba10-be5963beb26b
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: 9affb70d-be13-47ad-a79d-c4b02e8872a0
-      m_Path: <Mouse>/delta
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Axis
-      m_Flags: 0
-    - m_Name: 
-      m_Id: 7ccf1954-ed39-4321-9d2b-19a617dad7a9
-      m_Path: <Touchscreen>/delta
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Axis
-      m_Flags: 0
-    m_Flags: 0
-  speed: 0
-  inverted: 0
+  border: {fileID: 0}
