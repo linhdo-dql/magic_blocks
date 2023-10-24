@@ -38,7 +38,10 @@ public class BlockOnTrayController : MonoBehaviour
     {
         if (collider.CompareTag("Tray"))
         {
-            transform.localScale = Vector3.one;
+            gameObject.LeanScale(Vector3.one, 0.2f).setOnComplete(() =>
+            {
+                transform.localScale = Vector3.one;
+            });
         }
     }
 

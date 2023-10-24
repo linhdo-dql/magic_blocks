@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Flexalon;
 using Unity.Barracuda;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LayoutBlocksController : MonoBehaviour
 {
@@ -25,19 +26,22 @@ public class LayoutBlocksController : MonoBehaviour
             for (int j = 0; j < layoutBlock.Rows; j++)
             {
                 var block = Instantiate(blockPrefab, layoutBlock.transform);
+                var blockTransform = block.GetComponent<Transform>();
                 //                print(layerColors[i, j]);
                 // Mã màu hợp lệ, bạn có thể sử dụng đối tượng màu
                 Color color;
                 if (ColorUtility.TryParseHtmlString("#" + layerColors[i, j], out color))
                 {
+
                     block.GetComponent<MeshRenderer>().material = blockMaterial;
+                    block.GetComponent<MeshRenderer>().material.color = new Color(color.r, color.g, color.b, 0.25f);
                 }
                 else
                 {
                     block.GetComponent<MeshRenderer>().material = transparentMaterial;
                     block.GetComponent<BlockOnFrameController>().isTemp = true;
                 }
-                var blockPos = block.GetComponent<Transform>().localPosition;
+                var blockPos = blockTransform.localPosition;
                 block.GetComponent<Transform>().position = new Vector3(blockPos.x, blockPos.y, 0.5f);
             }
         }
@@ -83,7 +87,7 @@ public class LayoutBlocksController : MonoBehaviour
     internal void Reset()
     {
         transform.position = new Vector3(0, 0, 2);
-        transform.eulerAngles = new Vector3(10, 0, 0);
+        transform.eulerAngles = new Vector3(0, 0, 0);
         transform.localScale = Vector3.one;
         GetComponent<Rotatable>().speed = 0;
     }
