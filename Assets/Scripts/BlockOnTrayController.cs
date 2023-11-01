@@ -27,14 +27,14 @@ public class BlockOnTrayController : MonoBehaviour
         transform.position = new Vector3(transform.position.x, transform.position.y, 0.5f);
     }
 
-    public void PopulateData(float oldScale, string color, int x, int y)
+    public void PopulateData(float oldScale, string color, int _x, int _y)
     {
         isOnTray = false;
         isOnFrame = false;
         _oldScale = oldScale;
         this.color = color;
-        this.x = x;
-        this.y = y;
+        x = _x;
+        y = _y;
 
     }
 
@@ -45,6 +45,7 @@ public class BlockOnTrayController : MonoBehaviour
             gameObject.LeanScale(Vector3.one, 0.2f).setOnComplete(() =>
             {
                 transform.localScale = Vector3.one;
+                isOnTray = false;
             });
         }
     }
@@ -54,6 +55,7 @@ public class BlockOnTrayController : MonoBehaviour
         {
             transform.SetParent(LayoutResController.instance.gameObject.transform);
             LayoutResController.instance.GetComponent<FlexalonFlexibleLayout>().ForceUpdate();
+            isOnTray = true;
         }
     }
 
@@ -77,6 +79,21 @@ public class BlockOnTrayController : MonoBehaviour
     {
         this.x = x;
         this.y = y;
+    }
+
+    public void Clicked()
+    {
+        if (!isOnTray && !isOnFrame)
+        {
+            transform.SetParent(LayoutResController.instance.transform);
+            LayoutResController.instance.lockScroll = false;
+            LayoutResController.instance.AddAItem();
+        }
+        else
+        {
+            if (LayerBuildStateController.instance.crBuildLayerState != LayerBuildStateController.BuildLayerState.Build) return;
+            LayoutBlocksController.instance.ChangedBlockRes(gameObject);
+        }
     }
 
 }

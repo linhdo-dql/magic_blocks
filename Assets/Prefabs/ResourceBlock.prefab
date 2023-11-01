@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 145466483994502224}
   - component: {fileID: 1192461526730262567}
   - component: {fileID: 6732850646410677746}
-  - component: {fileID: -6215357643320761490}
   m_Layer: 0
   m_Name: ResourceBlock
   m_TagString: CubeResource
@@ -129,8 +128,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a690d2c0fb3b72a4bb20676afa420b71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _clickable: 0
-  _maxClickTime: 0.1
+  _clickable: 1
+  _maxClickTime: 0.15
   _draggable: 1
   _interpolationSpeed: 10
   _insertRadius: 0.5
@@ -152,7 +151,19 @@ MonoBehaviour:
     m_Bits: 4294967295
   _clicked:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6732850646410677746}
+        m_TargetAssemblyTypeName: BlockOnTrayController, Assembly-CSharp
+        m_MethodName: Clicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   _hoverStart:
     m_PersistentCalls:
       m_Calls: []
@@ -210,26 +221,5 @@ MonoBehaviour:
   color: 
   isOnTray: 0
   isOnFrame: 0
---- !u!114 &-6215357643320761490
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6994045059600001670}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4eda371e5375f454490a86f21559ee38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Use:
-    Filter: 0
-    IgnoreStartedOverGui: 1
-    RequiredFingerCount: 0
-    RequiredMouseButtons: 0
-    RequiredSelectable: {fileID: 0}
-  _camera: {fileID: 0}
-  sensitivity: 1
-  damping: -1
-  inertia: 0
-  remainingTranslation: {x: 0, y: 0, z: 0}
+  x: 0
+  y: 0

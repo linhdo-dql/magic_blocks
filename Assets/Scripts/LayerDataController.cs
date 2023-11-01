@@ -8,16 +8,14 @@ using UnityEngine.Networking;
 
 public class LayerDataController : MonoBehaviour
 {
-    public string[,] layerColors;
-    public List<SerializableColor> serializableColors;
-    private string folderName; // Tên thư mục chứa tệp tin
-    private string fileName; // Tên tệp tin
+    public SerializableColor[,] serializableColors;
+    public string folderName; // Tên thư mục chứa tệp tin
+    public string fileName; // Tên tệp tin
     public static LayerDataController instance;
 
     void Awake()
     {
         instance = this;
-        serializableColors = new List<SerializableColor>();
     }
     // Start is called before the first frame update
     void Start()
@@ -46,9 +44,9 @@ public class LayerDataController : MonoBehaviour
     }
     private void SetupLayout()
     {
-        LayoutBlocksController.instance.GenerateBlock(layerColors, serializableColors);
-        Camera.main.orthographicSize = MathF.Max(layerColors.GetLength(0), layerColors.GetLength(1)) + 4;
-        LayoutResController.instance.InitResources(layerColors, serializableColors);
+        LayoutBlocksController.instance.GenerateBlock(serializableColors);
+        Camera.main.orthographicSize = MathF.Max(serializableColors.GetLength(0), serializableColors.GetLength(1)) + 4;
+        LayoutResController.instance.InitResources(serializableColors);
         LayoutResController.instance.GetComponent<Transform>().localPosition = new Vector3((float)LayoutResController.instance.range + 1f, -Camera.main.orthographicSize + 1 + LayoutResController.instance.scaleRefactor / 2, 0);
 
         print("zo");
@@ -81,20 +79,19 @@ public class LayerDataController : MonoBehaviour
                 int maxColumnCount = 0;
                 foreach (SerializableColor serializableColor in colorData.colors)
                 {
-                    serializableColors.Add(serializableColor);
                     maxRowCount = Mathf.Max(maxRowCount, serializableColor.x);
                     maxColumnCount = Mathf.Max(maxColumnCount, serializableColor.y);
                 }
                 rowCount = maxRowCount + 1;
                 columnCount = maxColumnCount + 1;
-                layerColors = new string[rowCount, columnCount];
+                serializableColors = new SerializableColor[rowCount, columnCount];
                 foreach (SerializableColor serializableColor in colorData.colors)
                 {
                     int x = serializableColor.x;
                     int y = serializableColor.y;
                     if (x < rowCount && y < columnCount)
                     {
-                        layerColors[x, y] = ColorUtility.ToHtmlStringRGBA(serializableColor.ToColor());
+                        serializableColors[x, y] = serializableColor;
                     }
                 }
                 Debug.Log("Đọc File thành công!");
@@ -137,14 +134,14 @@ public class LayerDataController : MonoBehaviour
                     }
                     rowCount = maxRowCount + 1;
                     columnCount = maxColumnCount + 1;
-                    layerColors = new string[rowCount, columnCount];
+                    serializableColors = new SerializableColor[rowCount, columnCount];
                     foreach (SerializableColor serializableColor in colorData.colors)
                     {
                         int x = serializableColor.x;
                         int y = serializableColor.y;
                         if (x < rowCount && y < columnCount)
                         {
-                            layerColors[x, y] = ColorUtility.ToHtmlStringRGBA(serializableColor.ToColor());
+                            serializableColors[x, y] = serializableColor;
                         }
                     }
                     Debug.Log("Đọc File thành công!");

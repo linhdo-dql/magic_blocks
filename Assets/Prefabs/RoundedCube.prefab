@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7649822297177117477}
   - component: {fileID: 1192461526730262567}
   - component: {fileID: 7379188335964205701}
+  - component: {fileID: -1040691093537734671}
   m_Layer: 0
   m_Name: RoundedCube
   m_TagString: CubeBlock
@@ -95,7 +96,7 @@ BoxCollider:
   m_GameObject: {fileID: 6994045059600001670}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 8}
   m_Center: {x: -0.0012000054, y: 0.0023000091, z: -0.0012000054}
@@ -112,7 +113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _clickable: 1
-  _maxClickTime: 0.1
+  _maxClickTime: 0.15
   _draggable: 0
   _interpolationSpeed: 10
   _insertRadius: 0.5
@@ -180,3 +181,32 @@ MonoBehaviour:
   defaultMaterial: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   blockMaterial: {fileID: 2100000, guid: b4f38024b39f14159bc7bbc0bdf54f64, type: 2}
   isFilled: 0
+  saveColor: {r: 0, g: 0, b: 0, a: 0}
+  x: 0
+  y: 0
+  saveX: 0
+  saveY: 0
+  isTrueBlock: 0
+--- !u!114 &-1040691093537734671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6994045059600001670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eda371e5375f454490a86f21559ee38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Use:
+    Filter: 0
+    IgnoreStartedOverGui: 1
+    RequiredFingerCount: 0
+    RequiredMouseButtons: 0
+    RequiredSelectable: {fileID: 0}
+  _camera: {fileID: 0}
+  sensitivity: 1
+  damping: -1
+  inertia: 0
+  remainingTranslation: {x: 0, y: 0, z: 0}

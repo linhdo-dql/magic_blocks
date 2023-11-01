@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Flexalon;
 using Unity.Barracuda;
 using UnityEngine;
@@ -17,10 +18,10 @@ public class LayoutBlocksController : MonoBehaviour
     {
         instance = this;
     }
-    public void GenerateBlock(string[,] layerColors, List<SerializableColor> serializableColors)
+    public void GenerateBlock(SerializableColor[,] serializableColors)
     {
-        layoutBlock.Rows = layoutBlockDemo.Rows = (uint)layerColors.GetLength(1);
-        layoutBlock.Columns = layoutBlockDemo.Columns = (uint)layerColors.GetLength(0);
+        layoutBlock.Rows = layoutBlockDemo.Rows = (uint)serializableColors.GetLength(1);
+        layoutBlock.Columns = layoutBlockDemo.Columns = (uint)serializableColors.GetLength(0);
         int count = 0;
         for (int i = 0; i < layoutBlock.Columns; i++)
         {
@@ -28,24 +29,21 @@ public class LayoutBlocksController : MonoBehaviour
             {
                 var block = Instantiate(blockPrefab, layoutBlock.transform);
                 //Lưu tọa độ block
-                block.GetComponent<BlockOnFrameController>().SavePos(serializableColors[count].x, serializableColors[count].y);
+                block.GetComponent<BlockOnFrameController>().SavePos(serializableColors[i, j].x, serializableColors[i, j].y);
                 count++;
                 var blockDemo = Instantiate(blockPrefab, layoutBlockDemo.transform);
                 var blockTransform = block.GetComponent<Transform>();
                 var blockDemoTransform = blockDemo.GetComponent<Transform>();
                 //                print(layerColors[i, j]);
                 // Mã màu hợp lệ, bạn có thể sử dụng đối tượng màu
-                Color color;
-                if (ColorUtility.TryParseHtmlString("#" + layerColors[i, j], out color))
-                {
-                    block.GetComponent<MeshRenderer>().material = blockMaterial;
-                    blockDemo.GetComponent<MeshRenderer>().material.color = color;
-                }
-                else
-                {
-                    block.GetComponent<MeshRenderer>().material = transparentMaterial;
-                    block.GetComponent<BlockOnFrameController>().isTemp = true;
-                }
+                block.GetComponent<MeshRenderer>().material = blockMaterial;
+                blockDemo.GetComponent<MeshRenderer>().material.color = serializableColors[i, j].ToColor();
+
+                // else
+                // {
+                //     block.GetComponent<MeshRenderer>().material = transparentMaterial;
+                //     block.GetComponent<BlockOnFrameController>().isTemp = true;
+                // }
                 var blockPos = blockTransform.localPosition;
                 block.GetComponent<Transform>().position = new Vector3(blockPos.x, blockPos.y, 0.5f);
 
@@ -96,6 +94,7 @@ public class LayoutBlocksController : MonoBehaviour
 
     void Update()
     {
+
         if (LayerBuildStateController.instance.crBuildLayerState == LayerBuildStateController.BuildLayerState.View)
         {
             if (Input.touches.Length == 2)
@@ -130,5 +129,31 @@ public class LayoutBlocksController : MonoBehaviour
         transform.eulerAngles = new Vector3(0, 0, 0);
         transform.localScale = Vector3.one;
         GetComponent<Rotatable>().speed = 0;
+    }
+
+    public void ChangedBlockRes(GameObject blockOnTrayGo)
+    {
+        var blockOnTray = blockOnTrayGo.GetComponent<BlockOnTrayController>();
+        foreach (BlockOnFrameController blockOnFrame in transform.GetComponentsInChildren<BlockOnFrameController>())
+        {
+            if (blockOnTray.x == blockOnFrame.x && blockOnTray.y == blockOnFrame.y)
+            {
+                blockOnFrame.CopyBlock(blockOnTray);
+                Destroy(blockOnTrayGo);
+                break;
+            }
+        }
+    }
+
+    public void ReturnAllCubes()
+    {
+        foreach (BlockOnFrameController blockOnFrame in transform.GetComponentsInChildren<BlockOnFrameController>())
+        {
+            if (blockOnFrame.isFilled)
+            {
+                blockOnFrame.Clicked();
+            }
+        }
+        LayoutResController.instance.ShuffleChildren();
     }
 }

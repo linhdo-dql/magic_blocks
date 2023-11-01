@@ -9,18 +9,22 @@ public class BlockOnFrameController : MonoBehaviour
     public Material defaultMaterial;
     public Material blockMaterial;
     public bool isFilled;
-    private Color saveColor;
+    public Color saveColor;
     private MeshRenderer _meshRenderer;
     private BoxCollider _collider;
     internal bool isTemp;
     public int x;
     public int y;
+    public int saveX;
+    public int saveY;
+    public bool isTrueBlock;
 
     // Start is called before the first frame update
     void Start()
     {
         _meshRenderer = GetComponent<MeshRenderer>();
         _collider = GetComponent<BoxCollider>();
+        saveColor = Color.clear;
     }
     private void OnTriggerStay(Collider collider)
     {
@@ -34,31 +38,60 @@ public class BlockOnFrameController : MonoBehaviour
         float overlapPercentage = (distance / (_collider.bounds.size.magnitude + _collider.bounds.size.magnitude)) * 100f;
         if (collider.CompareTag("CubeResource") && overlapPercentage > 3)
         {
+            isTrueBlock = colliderController.x == x && colliderController.y == y;
+            if (!isTrueBlock)
+            {
+                saveX = colliderController.x;
+                saveY = colliderController.y;
+            }
+            else
+            {
+                saveX = x;
+                saveY = y;
+            }
             colliderController.isTriggered = true;
-            ChangeColor(colliderController);
+            CopyBlock(colliderController);
             Destroy(collider.gameObject);
-            isFilled = true;
-            LayoutResController.instance.SubtractPos();
         }
     }
 
+    public void CopyBlock(BlockOnTrayController colliderController)
+    {
+        ChangeColor(colliderController);
+        saveX = x;
+        saveY = y;
+        isFilled = true;
+        LayoutResController.instance.SubtractPos();
+    }
     public void Clicked()
     {
         if (!isFilled)
         {
+            if (LayerBuildStateController.instance.crBuildLayerState != LayerBuildStateController.BuildLayerState.Build) return;
             LayoutResController.instance.ChangedBlockRes(gameObject);
+            saveX = x;
+            saveY = y;
         }
         else
         {
             if (LayerBuildStateController.instance.crBuildLayerState != LayerBuildStateController.BuildLayerState.Break) return;
-            //SetTransparentMaterial
-            _meshRenderer.material = blockMaterial;
-            //Init a cube in Tray
-            LayoutResController.instance.ReturnCube(saveColor, x, y);
-            //Reset isFilled
-            isFilled = false;
+            ClickOnFilled(blockMaterial, saveColor, saveX, saveY);
         }
 
+    }
+
+    public void ClickOnFilled(Material material, Color saveColor, int x, int y)
+    {
+        //SetTransparentMaterial
+        _meshRenderer.material = material;
+        //Init a cube in Tray
+        LayoutResController.instance.ReturnCube(saveColor, x, y);
+        //Reset true state
+        isTrueBlock = false;
+        //Reset isFilled
+        isFilled = false;
+        //Reset colider size
+        GetComponent<BoxCollider>().size = new Vector3(1, 1, 4);
     }
 
     private void ChangeColor(BlockOnTrayController colliderController)
@@ -69,9 +102,9 @@ public class BlockOnFrameController : MonoBehaviour
         saveColor = color_new;
     }
 
-    internal void SavePos(int x, int y)
+    internal void SavePos(int _x, int _y)
     {
-        this.x = x;
-        this.y = y;
+        x = _x;
+        y = _y;
     }
 }

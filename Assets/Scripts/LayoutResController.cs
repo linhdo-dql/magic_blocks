@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Flexalon;
@@ -24,27 +25,25 @@ public class LayoutResController : MonoBehaviour
     {
         instance = this;
     }
-    public void InitResources(string[,] layerColors, System.Collections.Generic.List<SerializableColor> serializableColors)
+    public void InitResources(SerializableColor[,] serializableColors)
     {
         scaleRefactor = Camera.main.orthographicSize / 6;
         GetComponent<FlexalonObject>().Scale = new Vector3(scaleRefactor, scaleRefactor, scaleRefactor);
         Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position);
         print(screenPosition);
         int countTmp = 0;
-        for (int i = 0; i < layerColors.GetLength(1); i++)
+        for (int i = 0; i < serializableColors.GetLength(0); i++)
         {
-            for (int j = 0; j < layerColors.GetLength(0); j++)
+            for (int j = 0; j < serializableColors.GetLength(1); j++)
             {
                 // Mã màu hợp lệ, bạn có thể sử dụng đối tượng màu
-                Color color;
-                if (ColorUtility.TryParseHtmlString("#" + layerColors[j, i], out color))
-                {
-                    var block = Instantiate(blockPrefab, layoutBlock.transform);
-                    block.GetComponent<MeshRenderer>().material.color = color;
-                    block.GetComponent<BoxCollider>().enabled = true;
-                    block.GetComponent<BlockOnTrayController>().PopulateData(scaleRefactor, layerColors[j, i], serializableColors[countTmp].x, serializableColors[countTmp].y);
-                    countTmp++;
-                }
+
+                var block = Instantiate(blockPrefab, layoutBlock.transform);
+                block.GetComponent<MeshRenderer>().material.color = serializableColors[i, j].ToColor();
+                block.GetComponent<BoxCollider>().enabled = true;
+                block.GetComponent<BlockOnTrayController>().PopulateData(scaleRefactor, ColorUtility.ToHtmlStringRGBA(serializableColors[i, j].ToColor()), serializableColors[i, j].x, serializableColors[i, j].y);
+                countTmp++;
+
             }
         }
         _isInitDone = true;
@@ -53,6 +52,7 @@ public class LayoutResController : MonoBehaviour
         var trayScaleFactor = Camera.main.orthographicSize / 17;
         trayBorder.GetComponent<Transform>().localPosition = new Vector3(0, -Camera.main.orthographicSize + 1 + LayoutResController.instance.scaleRefactor / 2, 3);
         trayBorder.GetComponent<Transform>().localScale = new Vector3(25, trayScaleFactor + 0.05f, 1);
+        ShuffleChildren();
     }
 
     private float GetMaxXPosition(Transform[] transforms)
@@ -80,7 +80,7 @@ public class LayoutResController : MonoBehaviour
     {
         if (LayerBuildStateController.instance.crBuildLayerState == LayerBuildStateController.BuildLayerState.View) return;
         range = ((transform.childCount + (transform.childCount - 1) * 0.15) * scaleRefactor - Camera.main.orthographicSize) / 2;
-        if ((transform.childCount + (transform.childCount - 1) * 0.15f) < Camera.main.orthographicSize)
+        if ((transform.childCount + (transform.childCount - 1) * 0.15f) < Camera.main.orthographicSize - 1)
         {
             transform.localPosition = new Vector3(0, -Camera.main.orthographicSize + 1 + LayoutResController.instance.scaleRefactor / 2, 0);
             lockScroll = true;
@@ -90,16 +90,16 @@ public class LayoutResController : MonoBehaviour
             transform.localPosition = new Vector3((float)LayoutResController.instance.range + 0.5f, -Camera.main.orthographicSize + 1 + LayoutResController.instance.scaleRefactor / 2, 0);
             lockScroll = false;
         }
-        print(range);
-
-        GetComponent<FlexalonObject>().ForceUpdate();
-        GetComponent<FlexalonFlexibleLayout>().ForceUpdate();
     }
     public void AddPos()
     {
         if (LayerBuildStateController.instance.crBuildLayerState != LayerBuildStateController.BuildLayerState.Break) return;
+        AddAItem();
+    }
+    public void AddAItem()
+    {
         range = ((transform.childCount + (transform.childCount - 1) * 0.15) * scaleRefactor - Camera.main.orthographicSize) / 2;
-        if ((transform.childCount + (transform.childCount - 1) * 0.15f) < Camera.main.orthographicSize)
+        if ((transform.childCount + (transform.childCount - 1) * 0.15f) < Camera.main.orthographicSize - 1)
         {
             transform.localPosition = new Vector3(0, -Camera.main.orthographicSize + 1 + LayoutResController.instance.scaleRefactor / 2, 0);
         }
@@ -108,9 +108,6 @@ public class LayoutResController : MonoBehaviour
             lockScroll = false;
             transform.localPosition = new Vector3((float)LayoutResController.instance.range - 0.15f, -Camera.main.orthographicSize + 1 + LayoutResController.instance.scaleRefactor / 2, 0);
         }
-        print(range);
-        GetComponent<FlexalonObject>().ForceUpdate();
-        GetComponent<FlexalonFlexibleLayout>().ForceUpdate();
     }
     // Update is called once per frame
     void Update()
@@ -150,12 +147,12 @@ public class LayoutResController : MonoBehaviour
         }
     }
 
-    public void ReturnCube(Color saveColor, int x, int y)
+    public void ReturnCube(Color saveColor, int _x, int _y)
     {
         var block = Instantiate(blockPrefab, layoutBlock.transform);
         block.GetComponent<MeshRenderer>().material.color = saveColor;
         block.GetComponent<BoxCollider>().enabled = true;
-        block.GetComponent<BlockOnTrayController>().PopulateData(scaleRefactor, ColorUtility.ToHtmlStringRGBA(saveColor), x, y);
+        block.GetComponent<BlockOnTrayController>().PopulateData(scaleRefactor, ColorUtility.ToHtmlStringRGBA(saveColor), _x, _y);
         block.GetComponent<FlexalonInteractable>().Draggable = LayerBuildStateController.instance.crBuildLayerState != LayerBuildStateController.BuildLayerState.Break;
         AddPos();
     }
@@ -168,9 +165,46 @@ public class LayoutResController : MonoBehaviour
         }
     }
 
-    internal void ChangedBlockRes(GameObject blockOnFrame)
+    public void ShuffleChildren()
     {
-        //
+        // Lấy số lượng GameObject con trong cha
+        int childCount = transform.childCount;
+
+        // Tạo danh sách các chỉ số của GameObject con
+        List<int> indices = new List<int>();
+        for (int i = 0; i < childCount; i++)
+        {
+            indices.Add(i);
+        }
+
+        // Xáo trộn danh sách chỉ số
+        for (int i = 0; i < childCount - 1; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(i, childCount);
+            int temp = indices[i];
+            indices[i] = indices[randomIndex];
+            indices[randomIndex] = temp;
+        }
+
+        // Sắp xếp lại vị trí của các GameObject con dựa trên thứ tự đã xáo trộn
+        for (int i = 0; i < childCount; i++)
+        {
+            Transform child = transform.GetChild(indices[i]);
+            child.SetSiblingIndex(i);
+        }
+    }
+    internal void ChangedBlockRes(GameObject blockOnFrameObject)
+    {
+        var blockOnFrame = blockOnFrameObject.GetComponent<BlockOnFrameController>();
+        foreach (BlockOnTrayController blockOnTray in transform.GetComponentsInChildren<BlockOnTrayController>())
+        {
+            if (blockOnTray.x == blockOnFrame.x && blockOnTray.y == blockOnFrame.y)
+            {
+                blockOnFrame.CopyBlock(blockOnTray);
+                Destroy(blockOnTray.gameObject);
+                break;
+            }
+        }
     }
 }
 

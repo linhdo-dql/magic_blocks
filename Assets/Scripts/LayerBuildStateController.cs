@@ -17,6 +17,7 @@ public class LayerBuildStateController : MonoBehaviour
         Build,
         View,
         Break,
+        Guid
     }
 
     public static LayerBuildStateController instance;
