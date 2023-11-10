@@ -175,7 +175,7 @@ public class LayerBuildController : MonoBehaviour
             for (int x = 0; x < LayoutBlocksController.instance.layoutBlock.Rows; x++)
             {
                 BlockOnFrameController itemBlock = LayoutBlocksController.instance.transform.GetChild(count).GetComponent<BlockOnFrameController>();
-                colorData.colors.Add(new SerializableColor(itemBlock.saveColor, itemBlock.x, itemBlock.y));
+                colorData.colors.Add(new SerializableColor(itemBlock.saveColor, itemBlock.x, itemBlock.y, ColorUtility.ToHtmlStringRGBA(itemBlock.saveColor)));
                 count++;
             }
         }

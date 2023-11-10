@@ -17,6 +17,7 @@ public class ModelDataController : MonoBehaviour
     int maxRowCount = 0;
     int maxColumnCount = 0;
     public LayoutLayerTrayController layoutLayerTrayController;
+    public LayoutModelController layoutModelController;
     void Awake()
     {
         instance = this;
@@ -64,7 +65,6 @@ public class ModelDataController : MonoBehaviour
                 maxRowCount = Mathf.Max(maxRowCount, serializableColor.x);
                 maxColumnCount = Mathf.Max(maxColumnCount, serializableColor.y);
             }
-            _cameraSize = MathF.Max(maxRowCount, maxColumnCount) + 1;
             layoutLayerTrayController.InstantiateLayer(colorData, file);
     }
 
@@ -78,7 +78,7 @@ public class ModelDataController : MonoBehaviour
         var layoutLayerTrayTransform = layoutLayerTrayController.transform;
         layoutLayerTrayTransform.position = new Vector3(leftLimit + Camera.main.orthographicSize / 6, -topLimit + transform.childCount - Camera.main.orthographicSize / 3, 0);
         layoutLayerTrayController.SetBorderTrayLayout();
-        LayoutModelController.instance.SetTransform();
+        layoutModelController.SetTransform();
     }
 }
 

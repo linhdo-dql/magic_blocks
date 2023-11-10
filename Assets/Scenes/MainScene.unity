@@ -248,6 +248,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1581817714089560636, guid: ccef438f6fe6247f1b4b569828186905, type: 3}
+      propertyPath: layoutModelController
+      value: 
+      objectReference: {fileID: 526918617}
+    - target: {fileID: 1581817714089560636, guid: ccef438f6fe6247f1b4b569828186905, type: 3}
       propertyPath: layoutLayerTrayController
       value: 
       objectReference: {fileID: 1485057323706630983}
@@ -445,7 +449,7 @@ Transform:
   m_GameObject: {fileID: 526918611}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1760845340}
@@ -492,7 +496,7 @@ MonoBehaviour:
   _maxDepth: 1
   _maxDepthOfParent: 1
   _offset: {x: 0, y: 0, z: 0}
-  _scale: {x: 1.5, y: 1.5, z: 1.5}
+  _scale: {x: 1, y: 1, z: 1}
   _rotation: {x: 0, y: 0, z: 0, w: 1}
   _marginLeft: 0
   _marginRight: 0
@@ -537,11 +541,11 @@ MonoBehaviour:
   ShrinkSize: {x: 999999, y: 999999, z: 999999}
   TargetPosition: {x: 0, y: 0, z: 0}
   TargetRotation: {x: 0, y: 0, z: 0, w: 1}
-  TargetScale: {x: 1.5, y: 1.5, z: 1.5}
+  TargetScale: {x: 1, y: 1, z: 1}
   TargetRectSize: {x: 0, y: 0, z: 0}
   TransformPosition: {x: 0, y: 0, z: 0}
   TransformRotation: {x: 0, y: 0, z: 0, w: 1}
-  TransformScale: {x: 1.5, y: 1.5, z: 1.5}
+  TransformScale: {x: 1, y: 1, z: 1}
   TransformRectSize: {x: 0, y: 0}
 --- !u!114 &526918615
 MonoBehaviour:
@@ -2648,6 +2652,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   borderTray: {fileID: 5166405319717637013}
   layerPrefab: {fileID: 5234519028478951913, guid: 7ca5beeb0b12647e995ad0126342cd6c, type: 3}
+  blockPrefab: {fileID: 6994045059600001670, guid: 5f3496bac81aa4d13b49fb8fd83aa077, type: 3}
+  transparentMaterial: {fileID: 2100000, guid: cc6b0e6e56253473a93916fb055b49e5, type: 2}
 --- !u!1001 &3489772995080996264
 PrefabInstance:
   m_ObjectHideFlags: 0

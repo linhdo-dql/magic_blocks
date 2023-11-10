@@ -1,16 +1,17 @@
+using System.IO;
 using Flexalon;
+using Newtonsoft.Json;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.WSA;
 
 public class LayoutLayerTrayController : MonoBehaviour
 {
     public static LayoutLayerTrayController instance;
     public GameObject borderTray;
     public GameObject layerPrefab;
-    private SerializableColor[,] _serializableColors;
-    private Vector3 lastMousePosition;
-    private int range;
-    private Vector2 touchStartPosition;
-    private bool lockScroll;
+    public GameObject blockPrefab;
+    public Material transparentMaterial;
 
     void Awake()
     {
@@ -18,33 +19,56 @@ public class LayoutLayerTrayController : MonoBehaviour
     }
 
     public void InstantiateLayer(ColorData colorData, string fileName)
-    {
-        int rowCount = 0;
-        int columnCount = 0;
+    { 
+        var layer = Instantiate(layerPrefab, transform);
+        int maxRowCount = 0;
+        int maxColumnCount = 0;
+        string jsonData = BetterStreamingAssets.ReadAllText(fileName);
+        colorData = JsonConvert.DeserializeObject<ColorData>(jsonData);
         if (colorData != null && colorData.colors != null)
-        {
-            int maxRowCount = 0;
-            int maxColumnCount = 0;
+        { 
             foreach (SerializableColor serializableColor in colorData.colors)
             {
                 maxRowCount = Mathf.Max(maxRowCount, serializableColor.x);
                 maxColumnCount = Mathf.Max(maxColumnCount, serializableColor.y);
             }
-            rowCount = maxRowCount + 1;
-            columnCount = maxColumnCount + 1;
-            _serializableColors = new SerializableColor[rowCount, columnCount];
+            int rowCount = maxRowCount + 1;
+            int columnCount = maxColumnCount + 1;
+            layer.GetComponent<FlexalonGridLayout>().Columns = (uint) rowCount;
+            layer.GetComponent<FlexalonGridLayout>().Rows = (uint) columnCount;
             foreach (SerializableColor serializableColor in colorData.colors)
             {
                 int x = serializableColor.x;
                 int y = serializableColor.y;
                 if (x < rowCount && y < columnCount)
                 {
-                    _serializableColors[x, y] = serializableColor;
+                    var block = Instantiate(blockPrefab, layer.transform);
+                    //Lưu tọa độ block
+                    block.GetComponent<BlockOnFrameController>().SavePos(serializableColor.x, serializableColor.y);
+                    block.GetComponent<FlexalonInteractable>().enabled = false;
+                    block.GetComponent<BoxCollider>().size = Vector3.one;
+                    var blockTransform = block.GetComponent<Transform>();
+                    if(serializableColor.a == 0)
+                    {
+                        block.GetComponent<MeshRenderer>().material = transparentMaterial;
+                    }
+                    else
+                    {
+                        block.GetComponent<MeshRenderer>().material.color = serializableColor.ToColor();
+                    }
+                  
+                    var blockPos = blockTransform.localPosition;
+                    block.transform.position = new Vector3(blockPos.x, blockPos.y, 0.5f);
                 }
             }
-            var layer = Instantiate(layerPrefab, transform);
-            layer.GetComponent<LayerOnTrayController>().PopulateData(_serializableColors, fileName);
+            //layer.GetComponent<FlexalonObject>().Scale = new Vector3(0.25f, 0.25f, 0.25f);
+            Debug.Log("Đọc File thành công!");
         }
+        else
+        {
+            Debug.LogError("Dữ liệu không hợp lệ!");
+        }
+        
     }
     // Start is called before the first frame update
     void Start()

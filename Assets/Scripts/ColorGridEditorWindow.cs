@@ -124,7 +124,7 @@ public class ColorGridEditorWindow : EditorWindow
             {
                 for (int x = 0; x < colorGrid.GetLength(0); x++)
                 {
-                    colorData.colors.Add(new SerializableColor(colorGrid[x, y], x, y));
+                    colorData.colors.Add(new SerializableColor(colorGrid[x, y], x, y, colorGrid[x, y].a == 0 ? "none" : ColorUtility.ToHtmlStringRGBA(colorGrid[x, y])));
                 }
             }
 
@@ -167,7 +167,7 @@ public class ColorGridEditorWindow : EditorWindow
                         int y = serializableColor.y;
                         if (x < rowCount && y < columnCount)
                         {
-                            colorGrid[x, y] = serializableColor.ToColor();
+                            colorGrid[x, y] = serializableColor.colorStr == "none" ? Color.clear : serializableColor.ToColor();
                         }
                     }
                     Debug.Log("Đọc File thành công!");
@@ -205,8 +205,9 @@ public class SerializableColor
     public float a;
     public int x;
     public int y;
+    public string colorStr;
 
-    public SerializableColor(Color color, int xPos, int yPos)
+    public SerializableColor(Color color, int xPos, int yPos, string colorString)
     {
         r = color.r;
         g = color.g;
@@ -214,6 +215,7 @@ public class SerializableColor
         a = color.a;
         x = xPos;
         y = yPos;
+        colorStr = colorString;
     }
 
     public Color ToColor()
